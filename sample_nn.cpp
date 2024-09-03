@@ -133,18 +133,22 @@ void NeuralNet::initializeParams(){
     mt19937 gen{rd()};
     normal_distribution dist(0,1);
 
-    for(l=0; l<n_layers-1; l++) {
+    for(l=0; l<n_layers-2; l++) {
         cout<<"Enter no. of nodes in hidden layer "<<l+1<<": ";
         cin>>nnodes;
         weights[l].resize(nnodes);
 
         for (i=0;i<nnodes;i++){
-            for(j=0; j<currsize+1;j++) weights[l][i][j] = dist(gen);
+            weights[l][i].resize(currsize+1);
+            
+            for(j=0; j<currsize;j++) weights[l][i][j] = dist(gen);
+            weights[l][i][currsize]=0;
         }
         currsize=nnodes;
     }
     for (i=0;i<output_size;i++){
-            for(j=0; j<currsize+1;j++) weights[l][i][j] = dist(gen);
+            for(j=0; j<currsize;j++) weights[n_layers-2][i][j] = dist(gen);
+            weights[nl_layers-2][i][currsize]=0;
         }
 
     cout<<"Weights have been randomly initialized according to std normal dist.\n";
