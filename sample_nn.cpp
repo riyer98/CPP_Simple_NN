@@ -86,9 +86,9 @@ float NeuralNet::activation(float z){
     }
 }
 
-vector<float> NeuralNet::final_activation(vector<float> &finlayer){
+void NeuralNet::activatefinal (vector<float> &finlayer){
     switch(final_actfn_name){
-        case 'softmax':
+        case "softmax":
             float expsum=0;
         for (int i=0;i<finlayer.size();i++){
             finlayer[i] = exp(finlayer[i]);
@@ -96,10 +96,16 @@ vector<float> NeuralNet::final_activation(vector<float> &finlayer){
         }
         for (int i=0;i<finlayer.size();i++) 
             finlayer[i] /= expsum;
+        return;
+
+        case "sigmoid":
+        for (int i=0;i<finlayer.size();i++)
+            finlayer[i] = 1/(1+exp(-finlayer[i]));
+        return;
     }
 }
 
-void NeuralNet::setParams(){
+void NeuralNet::initializeParams(){
     
     cout<<"Enter input_size: ";
     cin>>input_size;
@@ -115,7 +121,8 @@ void NeuralNet::setParams(){
     cout<<"1)relu    2)sigmoid    3)none(default)\n";
     cin>>actfn_name;
 
-    cout<<
+    cout<<"Enter activation for final output layer. Available options:\n ";
+    cout<<"1) relu    2)softmax    3)sigmoid\n";
     
     random_device
 }
