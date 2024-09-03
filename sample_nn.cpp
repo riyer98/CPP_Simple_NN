@@ -89,7 +89,13 @@ float NeuralNet::activation(float z){
 vector<float> NeuralNet::final_activation(vector<float> &finlayer){
     switch(final_actfn_name){
         case 'softmax':
-        
+            float expsum=0;
+        for (int i=0;i<finlayer.size();i++){
+            finlayer[i] = exp(finlayer[i]);
+            expsum += finlayer[i];
+        }
+        for (int i=0;i<finlayer.size();i++) 
+            finlayer[i] /= expsum;
     }
 }
 
@@ -105,6 +111,11 @@ void NeuralNet::setParams(){
     cin>>n_layers;
     nlayers+=2;
 
+    cout<<"Enter activation function for hidden layers. Following can be used:\n";
+    cout<<"1)relu    2)sigmoid    3)none(default)\n";
+    cin>>actfn_name;
+
+    cout<<
     
     random_device
 }
