@@ -148,7 +148,7 @@ void NeuralNet::initializeParams(){
     }
     for (i=0;i<output_size;i++){
             for(j=0; j<currsize;j++) weights[n_layers-2][i][j] = dist(gen);
-            weights[nl_layers-2][i][currsize]=0;
+            weights[n_layers-2][i][currsize]=0;
         }
 
     cout<<"Weights have been randomly initialized according to std normal dist.\n";
