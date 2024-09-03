@@ -102,6 +102,8 @@ void NeuralNet::activatefinal (vector<float> &finlayer){
         for (int i=0;i<finlayer.size();i++)
             finlayer[i] = 1/(1+exp(-finlayer[i]));
         return;
+
+        default: return;
     }
 }
 
@@ -122,7 +124,7 @@ void NeuralNet::initializeParams(){
     cin>>actfn_name;
 
     cout<<"Enter activation for final output layer. Available options:\n ";
-    cout<<"1) relu    2)softmax    3)sigmoid\n";
+    cout<<"1)softmax    2)sigmoid\n";
     
     random_device
 }
