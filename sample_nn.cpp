@@ -117,7 +117,7 @@ void NeuralNet::initializeParams(){
 
     cout<<"Enter number of hidden layers: ";
     cin>>n_layers;
-    nlayers+=2;
+    n_layers+=2;
 
     cout<<"Enter activation function for hidden layers. Following can be used:\n";
     cout<<"1)relu    2)sigmoid    3)none(default)\n";
@@ -126,6 +126,28 @@ void NeuralNet::initializeParams(){
     cout<<"Enter activation for final output layer. Available options:\n ";
     cout<<"1)softmax    2)sigmoid\n";
     
-    random_device
+    int l,i,j, nnodes, currsize=input_size;
+
+    weights.resize(nlayers-1);
+    random_device rd;
+    mt19937 gen{rd()};
+    normal_distribution dist(0,1);
+
+    for(l=0; l<n_layers-1; l++) {
+        cout<<"Enter no. of nodes in hidden layer "<<l+1<<": ";
+        cin>>nnodes;
+        weights[l].resize(nnodes);
+
+        for (i=0;i<nnodes;i++){
+            for(j=0; j<currsize+1;j++) weights[l][i][j] = dist(gen);
+        }
+        currsize=nnodes;
+    }
+    for (i=0;i<output_size;i++){
+            for(j=0; j<currsize+1;j++) weights[l][i][j] = dist(gen);
+        }
+
+    cout<<"Weights have been randomly initialized according to std normal dist.\n";
+    
 }
 
