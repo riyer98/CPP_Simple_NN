@@ -16,14 +16,12 @@ class NeuralNet {
     vector<vector<float>> layers;
 
     float activation(float z);
-    vector<float> final_activation (vector<float> &finlayer);
+    void activatefinal (vector<float> &finlayer);
 
     public:
-    NeuralNet(int output_size);
-    NeuralNet(int hidden_layers, int output_size);
-
     void getParams(string filename);
 
     vector<float> getOutput(vector<float> &input_vec);
-    
+
+    void initializeParams();
 };
