@@ -4,12 +4,10 @@
 #include<cmath>
 #include<random>
 
-NeuralNet(int output_size): n_layers(2), output_size(output_size){}
-
 //aiming to store the params in the following format
 void NeuralNet::getParams(string filename){
 
-    ifstream paramfile=(filename);
+    ifstream paramfile(filename);
 
     //top of file contains no. of layers (including input and output), activation 
     //to be used and size of input vector
