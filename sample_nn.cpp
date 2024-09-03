@@ -4,6 +4,8 @@
 #include<cmath>
 #include<random>
 
+using namespace std;
+
 //aiming to store the params in the following format
 void NeuralNet::getParams(string filename){
 
@@ -59,7 +61,7 @@ vector<float> NeuralNet::getOutput(vector<float> &input_vec){
                 z += weights[l][i][j]* layers[l][j];
             } 
             
-            if(l=n_layers-2) layers[l+1][i] = z;
+            if(l==n_layers-2) layers[l+1][i] = z;
             else layers[l+1][i] = activation(z); 
         }
     }
@@ -70,38 +72,33 @@ vector<float> NeuralNet::getOutput(vector<float> &input_vec){
 
 
 float NeuralNet::activation(float z){
-    
-    switch (actfn_name){
-        case "relu":
+
+    if (actfn_name=="relu"){
         if(z<=0) return 0;
         else return z;
-
-        case "sigmoid":
-        return 1/(1+exp(-z));
-
-        default: 
-        return z;
     }
+
+    else if (actfn_name=="sigmoid")
+        return 1/(1+exp(-z));
+    
+    else return z;
 }
 
 void NeuralNet::activatefinal (vector<float> &finlayer){
-    switch(final_actfn_name){
-        case "softmax":
-            float expsum=0;
+    if (final_actfn_name=="softmax"){
+        float expsum=0;
+        
         for (int i=0;i<finlayer.size();i++){
             finlayer[i] = exp(finlayer[i]);
             expsum += finlayer[i];
         }
         for (int i=0;i<finlayer.size();i++) 
             finlayer[i] /= expsum;
-        return;
+    }
 
-        case "sigmoid":
+    else if(final_actfn_name=="sigmoid"){
         for (int i=0;i<finlayer.size();i++)
             finlayer[i] = 1/(1+exp(-finlayer[i]));
-        return;
-
-        default: return;
     }
 }
 
@@ -115,7 +112,7 @@ void NeuralNet::initializeParams(){
 
     cout<<"Enter number of hidden layers: ";
     cin>>n_layers;
-    n_layers+=2;
+    n_layers += 2;
 
     cout<<"Enter activation function for hidden layers. Following can be used:\n";
     cout<<"1)relu    2)sigmoid    3)none(default)\n";
@@ -123,34 +120,70 @@ void NeuralNet::initializeParams(){
 
     cout<<"Enter activation for final output layer. Available options:\n ";
     cout<<"1)softmax    2)sigmoid\n";
+    cin>>final_actfn_name;
     
     int l,i,j, nnodes, currsize=input_size;
 
-    weights.resize(nlayers-1);
-    random_device rd;
-    mt19937 gen{rd()};
-    normal_distribution dist(0,1);
+    weights.resize(n_layers-1);
+    
+    random_device gen;
+    normal_distribution<float> dist(0.0,1.0);
 
     for(l=0; l<n_layers-2; l++) {
         cout<<"Enter no. of nodes in hidden layer "<<l+1<<": ";
         cin>>nnodes;
         weights[l].resize(nnodes);
 
+        cout<<weights[l].size()<<endl;
+
         for (i=0;i<nnodes;i++){
             weights[l][i].resize(currsize+1);
             
-            for(j=0; j<currsize;j++) weights[l][i][j] = dist(gen);
+            for(j=0; j<currsize;j++)
+                weights[l][i][j] = dist(gen);
+            
             weights[l][i][currsize]=0;
         }
         currsize=nnodes;
     }
+
+    weights[n_layers-2].resize(output_size);
+    
     for (i=0;i<output_size;i++){
-            for(j=0; j<currsize;j++) weights[n_layers-2][i][j] = dist(gen);
-            weights[n_layers-2][i][currsize]=0;
+        weights[n_layers-2][i].resize(currsize+1);
+        
+        for(j=0; j<currsize;j++) 
+            weights[n_layers-2][i][j] = dist(gen);
+        
+        weights[n_layers-2][i][currsize]=0;
         }
 
     cout<<"Weights have been randomly initialized according to std normal dist.\n";
-    cout<<"Biases have been initialized to 0.\n";
-    
+    cout<<"Biases have been initialized to 0.\n"; 
 }
 
+void NeuralNet::saveParams(string filename){
+   
+    ofstream paramfile(filename, ios::trunc);
+    paramfile<<n_layers<<"\t\t"<<input_size<<"\t\t"<<actfn_name<<"\t\t"<<final_actfn_name<<endl;
+    paramfile<<endl;
+
+    int l,i,j, nextlayersize, currlayersize=input_size;
+    for(l=0;l<n_layers-1;l++){
+        nextlayersize=weights[l].size();
+
+        paramfile<<nextlayersize<<endl;
+        
+        for(i=0;i<nextlayersize; i++){
+            
+            for(j=0;j<currlayersize+1;j++)
+            paramfile<<weights[l][i][j]<<"\t\t"; 
+            
+            paramfile<<endl;
+        }
+        paramfile<<endl;
+    }
+    paramfile.close();
+    cout<<"Save succesful.\n";
+
+}

@@ -1,27 +1,26 @@
 #include<vector>
 #include<string>
 
-using namespace std;
-
 class NeuralNet {
     private:
     int n_layers;
-    string actfn_name;
-    string final_actfn_name;
+    std::string actfn_name;
+    std::string final_actfn_name;
     int input_size;
     int output_size;
 
     protected:
-    vector<vector<vector<float>>> weights;
-    vector<vector<float>> layers;
+    std::vector< std::vector< std::vector<float> > > weights;
+    std::vector< std::vector<float> > layers;
 
     float activation(float z);
-    void activatefinal (vector<float> &finlayer);
+    void activatefinal (std::vector<float> &finlayer);
 
     public:
-    void getParams(string filename);
+    void getParams(std::string filename);
 
-    vector<float> getOutput(vector<float> &input_vec);
+    std::vector<float> getOutput(std::vector<float> &input_vec);
 
     void initializeParams();
+    void saveParams(std::string filename);
 };
