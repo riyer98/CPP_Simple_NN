@@ -2,6 +2,7 @@
 #include<fstream>
 #include"sample_nn.h"
 #include<cmath>
+#include<random>
 
 NeuralNet(int output_size): n_layers(2), output_size(output_size){}
 
@@ -85,11 +86,14 @@ float NeuralNet::activation(float z){
     }
 }
 
-vector<float> final_activation(vector<float> &finlayer){
-
+vector<float> NeuralNet::final_activation(vector<float> &finlayer){
+    switch(final_actfn_name){
+        case 'softmax':
+        
+    }
 }
 
-void NeuralNet::setWeights(){
-
+void NeuralNet::setParams(){
+    
 }
 
