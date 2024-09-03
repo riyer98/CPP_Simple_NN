@@ -152,6 +152,7 @@ void NeuralNet::initializeParams(){
         }
 
     cout<<"Weights have been randomly initialized according to std normal dist.\n";
+    cout<<"Biases have been initialized to 0.\n";
     
 }
 
