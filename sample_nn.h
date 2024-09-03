@@ -25,7 +25,5 @@ class NeuralNet {
 
     float activation(float z);
     vector<float> final_activation (vector<float> &finlayer);
-
-    void setParams
     
 };
