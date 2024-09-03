@@ -58,7 +58,7 @@ vector<float> NeuralNet::getOutput(vector<float> &input_vec){
             z = weights[l][i][currlayersize];
             
             for (j=0;j< currlayersize;j++) {
-                z += weights[l][i][j+1]* layers[l][j];
+                z += weights[l][i][j]* layers[l][j];
             } 
             
             if(l=n_layers-2) layers[l+1][i] = z;
@@ -95,5 +95,17 @@ vector<float> NeuralNet::final_activation(vector<float> &finlayer){
 
 void NeuralNet::setParams(){
     
+    cout<<"Enter input_size: ";
+    cin>>input_size;
+
+    cout<<"Enter output_size: ";
+    cin>>output_size;
+
+    cout<<"Enter number of hidden layers: ";
+    cin>>n_layers;
+    nlayers+=2;
+
+    
+    random_device
 }
 
