@@ -65,7 +65,7 @@ vector<float> NeuralNet::getOutput(vector<float> &input_vec){
             else layers[l+1][i] = activation(z); 
         }
     }
-    layers[n_layers-1] = final_activation(layers[n_layers-1]);
+    activatefinal(layers[n_layers-1]);
 
     return layers[n_layers-1];
 }
