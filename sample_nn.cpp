@@ -122,7 +122,7 @@ void NeuralNet::initializeParams(){
     cout<<"1)softmax    2)sigmoid\n";
     cin>>final_actfn_name;
     
-    int l,i,j, nnodes, currsize=input_size;
+    int l,i,j, nextlayersize, currlayersize=input_size;
 
     weights.resize(n_layers-1);
     
@@ -131,32 +131,32 @@ void NeuralNet::initializeParams(){
 
     for(l=0; l<n_layers-2; l++) {
         cout<<"Enter no. of nodes in hidden layer "<<l+1<<": ";
-        cin>>nnodes;
-        weights[l].resize(nnodes);
+        cin>>nextlayersize;
+        weights[l].resize(nextlayersize);
 
         cout<<weights[l].size()<<endl;
 
-        for (i=0;i<nnodes;i++){
-            weights[l][i].resize(currsize+1);
+        for (i=0;i<nextlayersize;i++){
+            weights[l][i].resize(currlayersize+1);
             
-            for(j=0; j<currsize;j++)
+            for(j=0; j<currlayersize;j++)
                 weights[l][i][j] = dist(gen);
             
-            weights[l][i][currsize]=0;
+            weights[l][i][currlayersize]=0;
         }
-        currsize=nnodes;
+        currlayersize=nextlayersize;
     }
 
     weights[n_layers-2].resize(output_size);
     
     for (i=0;i<output_size;i++){
-        weights[n_layers-2][i].resize(currsize+1);
+        weights[n_layers-2][i].resize(currlayersize+1);
         
-        for(j=0; j<currsize;j++) 
+        for(j=0; j<currlayersize;j++) 
             weights[n_layers-2][i][j] = dist(gen);
         
-        weights[n_layers-2][i][currsize]=0;
-        }
+        weights[n_layers-2][i][currlayersize]=0;
+    }
 
     cout<<"Weights have been randomly initialized according to std normal dist.\n";
     cout<<"Biases have been initialized to 0.\n"; 
@@ -182,8 +182,9 @@ void NeuralNet::saveParams(string filename){
             paramfile<<endl;
         }
         paramfile<<endl;
+        currlayersize=nextlayersize;
     }
     paramfile.close();
-    cout<<"Save succesful.\n";
+    cout<<"Weights saved to "<<filename<<".\n\n";
 
 }
