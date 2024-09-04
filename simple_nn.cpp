@@ -188,7 +188,7 @@ void NeuralNet::saveParams(string filename){
 }
 
 
-float trainer::actfn_derivative(float a){
+float NeuralNet::actfn_derivative(float a){
     if(actfn_name=="relu"){
         if(a>0.0) return 1.0;
         else return 0.0;
@@ -201,7 +201,7 @@ float trainer::actfn_derivative(float a){
 }
 
 
-void trainer::backprop(vector<float> &desired_output){
+void NeuralNet::gradcalc(vector<float> &desired_output){
     
     gradient.resize(n_layers-1);
     int l,i,j,k, prevlayersize=weights[n_layers-2][0].size()-1, currlayersize=output_size, nextlayersize;

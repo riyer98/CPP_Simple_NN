@@ -3,7 +3,7 @@
 
 class NeuralNet {
     
-    protected:
+    private:
     int n_layers;
     int input_size;
     int output_size;
@@ -11,9 +11,15 @@ class NeuralNet {
     std::vector< std::vector<float> > layers;
     std::string actfn_name;
     std::string final_actfn_name;
+    
+    std::vector< std::vector< std::vector<float> > > gradient;
+    int batch_size;
+    std::string graddescname;
 
     float activation(float z);
+    float actfn_derivative(float a);
     void activatefinal (std::vector<float> &finlayer);
+    float costfn(std::vector<float> output_vec);
 
     
     public:
@@ -23,18 +29,17 @@ class NeuralNet {
 
     void feedfwd(std::vector<float> &input_vec);
 
+    void gradcalc(std::vector<float> &desired_output);
+
 };
 
 
 class trainer: public NeuralNet {
     private:
-    std::vector< std::vector< std::vector<float> > > gradient;
-    int batch_size;
-    std::string graddescname;
     
     public:
-    float costfn(std::vector<float> output_vec);
-    float actfn_derivative(float a);
+    
+    
 
-    void backprop(std::vector<float> &desired_output);
+    
 };
