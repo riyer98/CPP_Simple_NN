@@ -1,4 +1,4 @@
-#include "sample_nn.h"
+#include "simple_nn.h"
 
 int main(){
     NeuralNet ann;

@@ -1,6 +1,6 @@
 #include<iostream>
 #include<fstream>
-#include"sample_nn.h"
+#include"simple_nn.h"
 #include<cmath>
 #include<random>
 
