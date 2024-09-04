@@ -32,14 +32,3 @@ class NeuralNet {
     void gradcalc(std::vector<float> &desired_output);
 
 };
-
-
-class trainer: public NeuralNet {
-    private:
-    
-    public:
-    
-    
-
-    
-};
