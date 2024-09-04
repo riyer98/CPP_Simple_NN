@@ -39,7 +39,7 @@ void NeuralNet::getParams(string filename){
 }
 
 
-vector<float> NeuralNet::getOutput(vector<float> &input_vec){
+void NeuralNet::feedfwd(vector<float> &input_vec){
     
     //first layer is input
     layers[0]=input_vec;
@@ -66,8 +66,6 @@ vector<float> NeuralNet::getOutput(vector<float> &input_vec){
         }
     }
     activatefinal(layers[n_layers-1]);
-
-    return layers[n_layers-1];
 }
 
 
@@ -187,4 +185,62 @@ void NeuralNet::saveParams(string filename){
     paramfile.close();
     cout<<"Weights saved to "<<filename<<".\n\n";
 
+}
+
+
+float trainer::actfn_derivative(float a){
+    if(actfn_name=="relu"){
+        if(a>0.0) return 1.0;
+        else return 0.0;
+    }
+
+    else if (actfn_name=="sigmoid")
+    return a*(1-a);
+
+    else return 1.0;
+}
+
+
+void trainer::backprop(vector<float> &desired_output){
+    
+    gradient.resize(n_layers-1);
+    int l,i,j,k, prevlayersize=weights[n_layers-2][0].size()-1, currlayersize=output_size, nextlayersize;
+    float gradsum;
+
+    gradient[n_layers-2].resize(currlayersize);
+    
+    for (i=0;i<currlayersize;i++){
+        gradient[n_layers-2][i].resize(prevlayersize+1);
+        gradsum= (layers[n_layers-1][i]-desired_output[i]);
+
+        gradient[n_layers-2][i][prevlayersize]= gradsum;
+
+        for(j=0;j<prevlayersize; j++)
+        gradient[n_layers-2][i][j] = layers[n_layers-2][j]*gradsum;
+       
+    }
+
+    nextlayersize=currlayersize;
+    currlayersize=prevlayersize;
+   
+    for (l=n_layers-3; l>=0;l--){
+        
+        prevlayersize=weights[l][0].size()-1;
+        gradient[l].resize(prevlayersize+1);
+
+        for(i=0;i<currlayersize; i++){
+            gradsum=0;
+            
+            for (k=0; k<nextlayersize; k++)
+                gradsum += gradient[l+1][k][i]/layers[l+1][i]*weights[l+1][k][i]*actfn_derivative(layers[l+1][i]);
+
+            gradient[l][i][prevlayersize]=gradsum;
+            
+            for (j=0;j<prevlayersize; j++)
+                gradient[l][i][j]= layers[l][j]*gradsum;
+        }
+
+        nextlayersize=currlayersize;
+        currlayersize=prevlayersize;
+    }
 }
