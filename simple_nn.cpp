@@ -38,7 +38,7 @@ void NeuralNet::getParams(string filename){
     }
 }
 
-
+//feed forward func
 void NeuralNet::feedfwd(vector<float> &input_vec){
     
     //first layer is input
@@ -55,12 +55,15 @@ void NeuralNet::feedfwd(vector<float> &input_vec){
         
         for (i=0; i<nextlayersize; i++){
             
+            //sum initialized to bias term
             z = weights[l][i][currlayersize];
             
             for (j=0;j< currlayersize;j++) {
+                //feedforward step
                 z += weights[l][i][j]* layers[l][j];
             } 
             
+            //final layer uses different activation (e.g. softmax)
             if(l==n_layers-2) layers[l+1][i] = z;
             else layers[l+1][i] = activation(z); 
         }
@@ -95,6 +98,7 @@ void NeuralNet::activatefinal (vector<float> &finlayer){
     }
 
     else if(final_actfn_name=="sigmoid"){
+        
         for (int i=0;i<finlayer.size();i++)
             finlayer[i] = 1/(1+exp(-finlayer[i]));
     }
@@ -117,7 +121,7 @@ void NeuralNet::initializeParams(){
     cin>>actfn_name;
 
     cout<<"Enter activation for final output layer. Available options:\n ";
-    cout<<"1)softmax    2)sigmoid\n";
+    cout<<"1)softmax    2)sigmoid   3)none(default)\n";
     cin>>final_actfn_name;
     
     int l,i,j, nextlayersize, currlayersize=input_size;
@@ -209,12 +213,15 @@ void NeuralNet::gradcalc(vector<float> &desired_output){
 
     gradient[n_layers-2].resize(currlayersize);
     
+    //calculating gradient for weights and biases of final layer
     for (i=0;i<currlayersize;i++){
         gradient[n_layers-2][i].resize(prevlayersize+1);
         gradsum= (layers[n_layers-1][i]-desired_output[i]);
 
+        //gradient of biases
         gradient[n_layers-2][i][prevlayersize]= gradsum;
 
+        //gradient of weights
         for(j=0;j<prevlayersize; j++)
         gradient[n_layers-2][i][j] = layers[n_layers-2][j]*gradsum;
        
@@ -223,6 +230,7 @@ void NeuralNet::gradcalc(vector<float> &desired_output){
     nextlayersize=currlayersize;
     currlayersize=prevlayersize;
    
+    //now propagating backwards
     for (l=n_layers-3; l>=0;l--){
         
         prevlayersize=weights[l][0].size()-1;
@@ -231,11 +239,17 @@ void NeuralNet::gradcalc(vector<float> &desired_output){
         for(i=0;i<currlayersize; i++){
             gradsum=0;
             
+            //summing up gradients of the forward layer to calculate gradients of
+            //current layer
             for (k=0; k<nextlayersize; k++)
-                gradsum += gradient[l+1][k][i]/layers[l+1][i]*weights[l+1][k][i]*actfn_derivative(layers[l+1][i]);
+                gradsum += gradient[l+1][k][i]*weights[l+1][k][i];
 
+            gradsum = gradsum/layers[l+1][i] * actfn_derivative(layers[l+1][i]);
+
+            //biases gradient
             gradient[l][i][prevlayersize]=gradsum;
             
+            //weights gradient
             for (j=0;j<prevlayersize; j++)
                 gradient[l][i][j]= layers[l][j]*gradsum;
         }
