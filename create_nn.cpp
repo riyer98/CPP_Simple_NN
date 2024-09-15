@@ -4,7 +4,7 @@ int main(){
     NeuralNet ann;
 
     ann.initializeParams();
-    ann.saveParams("testwts.txt");
+    ann.saveParams("iris_weights1.txt");
 
     return 0;
 }

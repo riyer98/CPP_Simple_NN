@@ -8,7 +8,7 @@ using namespace std;
 void getInputOutput(vector<vector<float> > &species, vector<vector<float> > &flowerparams, int &trainsize);
 
 
-int main(){
+int main(int argc, char ** argv){
 
     vector<vector<float> > species;
     vector<vector<float> > flowerparams;
@@ -19,7 +19,7 @@ int main(){
     //NeuralNet whatspecies(flowerparams[0].size(),3);
     NeuralNet whatspecies;
 
-    whatspecies.getParams("iris_weights.txt");
+    whatspecies.getParams(argv[1]);
 
    /*for(int i=0;i<trainsize;i++) {
         whatspecies.feedfwd(flowerparams[i]);
@@ -71,7 +71,6 @@ int main(){
         cout<<"Epoch "<<epochcount+1<<" done.\n";
         
         for (i=0;i<trainsize;i++){
-            
             whatspecies.feedfwd(flowerparams[i]);
             vector<float> output = whatspecies.Output();
             //cout<<output[0]<<"\t"<<output[1]<<"\t"<<output[2]<<endl;
@@ -85,7 +84,7 @@ int main(){
         cout<<"Loss = "<<lossfn<<endl;   
     }
 
-    whatspecies.saveParams("iris_weights.txt");
+    whatspecies.saveParams(argv[1]);
 
     return 0;
 }

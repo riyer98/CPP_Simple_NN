@@ -64,10 +64,12 @@ int main(){
         batch_start = 0; lossfn = 0.0; accuracy =0.0;
 
         while(batch_start<trainsize){
-            if (batch_remaining/batch_size>1)
+            if (batch_remaining/batch_size>1){
                 batch_end = batch_start+batch_size;
-            else
+            }
+            else{
                 batch_end = batch_start+batch_remaining;
+            }
             
             vector<vector<float> > input_batch(normedpixelvals.begin()+batch_start,normedpixelvals.begin()+batch_end);
             vector<vector<float> > output_batch(numbers.begin()+batch_start, numbers.begin()+batch_end);
@@ -87,8 +89,9 @@ int main(){
             vector<float> output = whatdigit.Output();
             
             lossfn -= whatdigit.costfn(numbers[i]);
-            if (distance(output.begin(), max_element(output.begin(),output.end()))==distance(numbers[i].begin(), max_element(numbers[i].begin(),numbers[i].end())))
+            if (distance(output.begin(), max_element(output.begin(),output.end()))==distance(numbers[i].begin(), max_element(numbers[i].begin(),numbers[i].end()))){
                 accuracy++;
+            }
 
         }
         lossfn/= trainsize;
