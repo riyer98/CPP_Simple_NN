@@ -5,24 +5,29 @@
 using namespace std;
 
 
-void getInputOutput(vector<int> &numbers, vector<vector<float> > &normedpixelvals, int &trainsize);
+void getInputOutput(vector<vector<float> > &numbers, vector<vector<float> > &normedpixelvals, int &trainsize);
 
 
 int main(){
 
-    vector<int> numbers;
+    vector<vector<float> > numbers;
     vector<vector<float> > normedpixelvals;
     int trainsize=0;
 
     getInputOutput(numbers,normedpixelvals, trainsize);
 
-    NeuralNet whatdigit(normedpixelvals[0].size(),10);
+    //NeuralNet whatdigit(normedpixelvals[0].size(),10);
+    NeuralNet whatdigit;
+    //whatdigit.initializeParams();
+    whatdigits.getParams("mnist_weights.txt");
 
-    whatdigit.initializeParams();
+    /*clock_t start = clock();
 
-   /* clock_t start = clock();
+    int index;
 
-    whatdigit.feedfwd(normedpixelvals[0]);
+    cin>>index;
+
+    whatdigit.feedfwd(normedpixelvals[index]);
 
     vector<float> op = whatdigit.Output();
 
@@ -30,15 +35,11 @@ int main(){
     
     for(int i=0;i<10;i++) cout<<op[i]<<"\t";
     cout<<endl;
-    cout<< distance(op.begin(),max_element(op.begin(),op.end()))<<endl;
     cout<<"time taken for feedfwd: "<<(float)(end-start)/1000000<<endl;
 
     start = clock();
 
-    vector<float> one_hot(10,0.0);
-    one_hot[numbers[0]]=1.0;
-
-    whatdigit.gradcalc(one_hot);
+    whatdigit.gradcalc(numbers[index]);
 
     end = clock();
     cout<<"time for gradient: "<<(float)(end-start)/1000000<<endl;*/
@@ -69,15 +70,12 @@ int main(){
                 batch_end = batch_start+batch_remaining;
             
             vector<vector<float> > input_batch(normedpixelvals.begin()+batch_start,normedpixelvals.begin()+batch_end);
-            vector<vector<float> > one_hot_outputs(input_batch.size(), vector<float>(10,0.0));
-
-            for (i=0;i<input_batch.size();i++)
-                one_hot_outputs[i][numbers[batch_start+i]]=1.0;
+            vector<vector<float> > output_batch(numbers.begin()+batch_start, numbers.begin()+batch_end);
         
-            whatdigit.minibatchdesc(input_batch, one_hot_outputs, input_batch.size());
+            whatdigit.minibatchdesc(input_batch, output_batch, input_batch.size());
             batch_remaining -= batch_size;
             batch_start = batch_end;
-            cout<<"Success! "<<batch_end<<endl;
+            //cout<<"Success! "<<batch_end<<endl;
         }   
         
         cout<<"Epoch "<<epochcount+1<<" done.\n";
@@ -86,10 +84,10 @@ int main(){
             
             whatdigit.feedfwd(normedpixelvals[i]);
             
-            vector<float> output_vector = whatdigit.Output();
+            vector<float> output = whatdigit.Output();
             
-            lossfn -= log(output_vector[numbers[i]]);
-            if (distance(output_vector.begin(), max_element(output_vector.begin(),output_vector.end()))==numbers[i])
+            lossfn -= whatdigit.costfn(numbers[i]);
+            if (distance(output.begin(), max_element(output.begin(),output.end()))==distance(numbers[i].begin(), max_element(numbers[i].begin(),numbers[i].end())))
                 accuracy++;
 
         }
@@ -109,9 +107,9 @@ int main(){
 
 
 
-void getInputOutput(vector<int> &numbers, vector<vector<float> > &normedpixelvals, int &trainsize){
+void getInputOutput(vector<vector<float> > &numbers, vector<vector<float> > &normedpixelvals, int &trainsize){
     
-    ifstream trainfile("mnist_train.csv");
+    ifstream trainfile("/Users/rajgopalan/mnist_train.csv");
     string line, num; 
     cout<<"Retrieving MNIST data...\n";
 
@@ -119,11 +117,13 @@ void getInputOutput(vector<int> &numbers, vector<vector<float> > &normedpixelval
         stringstream s(line);
 
         getline(s,num,',');
-        numbers.push_back(stoi(num));
+        numbers.push_back(vector<float>(10,0.0));
         normedpixelvals.push_back(vector<float>());
 
+        numbers[trainsize][stoi(num)]=1.0;
+
         while(getline(s,num,','))
-            normedpixelvals[trainsize].push_back((float)stoi(num)/255);
+            normedpixelvals[trainsize].push_back(stof(num)/255);
         trainsize++;
     }
     cout<<"Training data size = "<<trainsize<<endl;

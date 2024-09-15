@@ -27,6 +27,9 @@ void NeuralNet::getParams(string filename){
     //contains the biases. That is, weights[l][i][currlayersize] = b[i]
     weights.resize(n_layers-1);
     layers.resize(n_layers);
+    gradient.resize(n_layers-1);
+    steps.resize(n_layers-1);
+    
     layers[0].resize(input_size);
 
     int nextlayersize, currlayersize=input_size;
@@ -34,10 +37,14 @@ void NeuralNet::getParams(string filename){
     for(int l=0;l<n_layers-1;l++){
         paramfile>>nextlayersize;
         weights[l].resize(nextlayersize);
+        gradient[l].resize(nextlayersize);
+        steps[l].resize(nextlayersize);
         layers[l+1].resize(nextlayersize);
         
         for (int i=0;i<nextlayersize;i++){
             weights[l][i].resize(currlayersize+1);
+            gradient[l][i].resize(currlayersize+1);
+            steps[l][i].resize(currlayersize+1);
             
             for (int j=0;j<=currlayersize;j++) {
                 paramfile >> weights[l][i][j];
@@ -45,81 +52,12 @@ void NeuralNet::getParams(string filename){
         }
         currlayersize=nextlayersize;
     }
-<<<<<<< HEAD
     cout<<"Parameters successfully obtained.\n";
     cout<<"Input size: "<<input_size<<endl;
     cout<<"Output size: "<<output_size<<endl;
     cout<<"Hidden layers: "<<n_layers-2<<endl;
     cout<<"Activation: "<<actfn_name<<endl;
     cout<<"Final layer activation: "<<final_actfn_name<<endl;
-=======
-}
-
-//feed forward func
-void NeuralNet::feedfwd(vector<float> &input_vec){
-    
-    //first layer is input
-    layers[0]=input_vec;
-    
-    //layer index, next layer index and current layer index
-    int l, i, j, nextlayersize, currlayersize;
-    float z;
-
-    for (l=0; l<n_layers-1; l++){
-        
-        nextlayersize = weights[l].size();
-        currlayersize = layers[l].size();
-        
-        for (i=0; i<nextlayersize; i++){
-            
-            //sum initialized to bias term
-            z = weights[l][i][currlayersize];
-            
-            for (j=0;j< currlayersize;j++) {
-                //feedforward step
-                z += weights[l][i][j]* layers[l][j];
-            } 
-            
-            //final layer uses different activation (e.g. softmax)
-            if(l==n_layers-2) layers[l+1][i] = z;
-            else layers[l+1][i] = activation(z); 
-        }
-    }
-    activatefinal(layers[n_layers-1]);
-}
-
-
-float NeuralNet::activation(float z){
-
-    if (actfn_name=="relu"){
-        if(z<=0) return 0;
-        else return z;
-    }
-
-    else if (actfn_name=="sigmoid")
-        return 1/(1+exp(-z));
-    
-    else return z;
-}
-
-void NeuralNet::activatefinal (vector<float> &finlayer){
-    if (final_actfn_name=="softmax"){
-        float expsum=0;
-        
-        for (int i=0;i<finlayer.size();i++){
-            finlayer[i] = exp(finlayer[i]);
-            expsum += finlayer[i];
-        }
-        for (int i=0;i<finlayer.size();i++) 
-            finlayer[i] /= expsum;
-    }
-
-    else if(final_actfn_name=="sigmoid"){
-        
-        for (int i=0;i<finlayer.size();i++)
-            finlayer[i] = 1/(1+exp(-finlayer[i]));
-    }
->>>>>>> parent of 94bd471 (added mnist data)
 }
 
 void NeuralNet::initializeParams(){
@@ -235,9 +173,6 @@ void NeuralNet::saveParams(string filename){
 
 }
 
-
-<<<<<<< HEAD
-<<<<<<< HEAD
 //feed forward func
 void NeuralNet::feedfwd(vector<float> &input_vec){
     
@@ -321,10 +256,6 @@ void NeuralNet::activatefinal (vector<float> &finlayer){
 }
 
 
-=======
->>>>>>> parent of 94bd471 (added mnist data)
-=======
->>>>>>> parent of 94bd471 (added mnist data)
 float NeuralNet::actfn_derivative(float a){
     if(actfn_name=="relu"){
         if(a==0.0) return 0.0;
