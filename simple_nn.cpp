@@ -99,7 +99,7 @@ void NeuralNet::initializeParams(){
     layers[0].resize(input_size);
     
     random_device gen;
-    normal_distribution<float> dist(0.0,1.0);
+    uniform_real_distribution<float> dist(-1.0,1.0);
 
     for(l=0; l<n_layers-2; l++) {
         
@@ -142,7 +142,7 @@ void NeuralNet::initializeParams(){
         weights[n_layers-2][i][currlayersize]=0.0;
     }
 
-    cout<<"Weights have been randomly initialized according to std normal dist.\n";
+    cout<<"Weights have been randomly initialized according to uniform dist(-1,1).\n";
     cout<<"Biases have been initialized to 0.\n"; 
 }
 
@@ -371,11 +371,12 @@ float NeuralNet::costfn(int onehotindex, const vector<float> &desired_output){
 
 
 void NeuralNet::initializesteps(){
-    int l,i, currlayersize=input_size, nextlayersize;
+    int l,i,j, currlayersize=input_size, nextlayersize;
     for (l=0;l<n_layers-1;l++){
         nextlayersize=steps[l].size();
-        for (i=0;i<nextlayersize;i++)
-            steps[l][i]=vector<float>(currlayersize+1,0.0);
+        for (i=0;i<nextlayersize;i++){
+            for (j=0;j<=currlayersize;j++) steps[l][i][j]=0.0;
+        }
         currlayersize=nextlayersize;
     }
 }
