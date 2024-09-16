@@ -5,13 +5,13 @@
 using namespace std;
 
 
-void getInputOutput(vector<int> &numbers, vector<vector<double> > &normedpixelvals, int &trainsize);
+void getInputOutput(vector<int> &numbers, vector<vector<float> > &normedpixelvals, int &trainsize);
 
 
 int main(int argc, char** argv){
 
     vector<int> numbers;
-    vector<vector<double> > normedpixelvals;
+    vector<vector<float> > normedpixelvals;
     int trainsize=0;
 
     getInputOutput(numbers,normedpixelvals, trainsize);
@@ -28,24 +28,24 @@ int main(int argc, char** argv){
 
     whatdigit.feedfwd(normedpixelvals[index]);
 
-    vector<double> op = whatdigit.Output();
+    vector<float> op = whatdigit.Output();
 
     clock_t end = clock();
     
     for(int i=0;i<10;i++) cout<<op[i]<<"\t";
     cout<<endl;
-    cout<<"time taken for feedfwd: "<<(double)(end-start)/1000000<<endl;
+    cout<<"time taken for feedfwd: "<<(float)(end-start)/1000000<<endl;
 
     start = clock();
 
     whatdigit.gradcalc(numbers[index]);
 
     end = clock();
-    cout<<"time for gradient: "<<(double)(end-start)/1000000<<endl;*/
+    cout<<"time for gradient: "<<(float)(end-start)/1000000<<endl;*/
 
     int epochs, batch_size, epochcount, i;
-    double lossfn, accuracy, learningrate=0.1;
-    vector<double> output;
+    float lossfn, accuracy, learningrate=0.1;
+    vector<float> output;
 
     cout<<"Enter number of epochs: ";
     cin>>epochs;
@@ -104,7 +104,7 @@ int main(int argc, char** argv){
 
 
 
-void getInputOutput(vector<int> &numbers, vector<vector<double> > &normedpixelvals, int &trainsize){
+void getInputOutput(vector<int> &numbers, vector<vector<float> > &normedpixelvals, int &trainsize){
     
     ifstream trainfile("/Users/rajgopalan/mnist_train.csv");
     string line, num; 
@@ -115,7 +115,7 @@ void getInputOutput(vector<int> &numbers, vector<vector<double> > &normedpixelva
 
         getline(s,num,',');
         numbers.push_back(stoi(num));
-        normedpixelvals.push_back(vector<double>());
+        normedpixelvals.push_back(vector<float>());
 
         while(getline(s,num,','))
             normedpixelvals[trainsize].push_back(stof(num)/255);
