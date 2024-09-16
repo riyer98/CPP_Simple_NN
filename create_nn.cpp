@@ -1,10 +1,10 @@
 #include "simple_nn.h"
 
-int main(){
+int main(int argc, char ** argv){
     NeuralNet ann;
 
     ann.initializeParams();
-    ann.saveParams("iris_weights1.txt");
+    ann.saveParams(argv[1]);
 
     return 0;
 }

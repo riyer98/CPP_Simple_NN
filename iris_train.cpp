@@ -1,37 +1,30 @@
 #include"simple_nn.h"
 #include<sstream>
-//#include<algorithm>
+#include<algorithm>
 
 using namespace std;
 
 
-void getInputOutput(vector<vector<float> > &species, vector<vector<float> > &flowerparams, int &trainsize);
+void getInputOutput(vector<int> &species, vector<vector<float> > &flowerparams, int &datasize);
 
 
 int main(int argc, char ** argv){
 
-    vector<vector<float> > species;
+    vector<int> species;
     vector<vector<float> > flowerparams;
-    int trainsize = 0;
+    int datasize = 0;
 
-    getInputOutput(species,flowerparams, trainsize);
+    getInputOutput(species,flowerparams, datasize);
 
-    //NeuralNet whatspecies(flowerparams[0].size(),3);
     NeuralNet whatspecies;
 
     whatspecies.getParams(argv[1]);
 
-   /*for(int i=0;i<trainsize;i++) {
-        whatspecies.feedfwd(flowerparams[i]);
-        vector<float> result = whatspecies.Output();
-        cout<< distance(result.begin(),max_element(result.begin(),result.end()))<<"\t"<<distance(species[i].begin(),max_element(species[i].begin(),species[i].end()));
-        cout<<endl;
-    }*/
-
-    //whatspecies.initializeParams();
-
-    int epochs, batch_size, epochcount, i, batch_start, batch_end, batch_remaining;
-    float lossfn, accuracy;
+    int epochs, batch_size, epochcount, i;
+    float lossfn, accuracy, learningrate=0.05;
+    vector<float> output;
+    int trainsize=(int)(0.8*datasize);
+    //int trainsize=datasize;
 
     cout<<"Enter number of epochs: ";
     cin>>epochs;
@@ -39,50 +32,70 @@ int main(int argc, char ** argv){
     cout<<"Enter mini-batch size: ";
     cin>>batch_size;
 
-    /*random_device rd;
+    random_device rd;
     mt19937 eng1(rd());
-    mt19937 eng2 = eng1;*/
+    mt19937 eng2 = eng1;
 
-    for (epochcount=0; epochcount<epochs; epochcount++){
+    for (epochcount=0; epochcount<epochs; epochcount++){   
 
-        //shuffle(flowerparams.begin(), flowerparams.end(),eng1);
-        //shuffle(species.begin(), species.end(),eng2);     
+        shuffle(flowerparams.begin(), flowerparams.end(),eng1);
+        shuffle(species.begin(), species.end(),eng2);     
 
-        batch_remaining = trainsize;
-        batch_start = 0; 
         lossfn = 0.0; accuracy = 0.0;
 
-        /*while(batch_start<trainsize){
-            if (batch_remaining/batch_size>1)
-                batch_end = batch_start+batch_size;
-            else
-                batch_end = batch_start+batch_remaining;
-            
-            vector<vector<float> > input_batch(flowerparams.begin()+batch_start,flowerparams.begin()+batch_end);
-            vector<vector<float> > output_batch(species.begin()+batch_start,species.begin()+batch_end);
-
-            whatspecies.minibatchdesc(input_batch, output_batch, input_batch.size());
-            batch_remaining -= batch_size;
-            batch_start = batch_end;
-            //cout<<"Success! "<<batch_end<<endl;
-        } */
-
-       whatspecies.minibatchdesc(flowerparams,species,trainsize);
-        cout<<"Epoch "<<epochcount+1<<" done.\n";
-        
+        whatspecies.initializesteps();
         for (i=0;i<trainsize;i++){
+
             whatspecies.feedfwd(flowerparams[i]);
-            vector<float> output = whatspecies.Output();
-            //cout<<output[0]<<"\t"<<output[1]<<"\t"<<output[2]<<endl;
+            //cout<<"feedfwd successful "<<i<<endl;
+            output = whatspecies.Output();
+            /*if(epochcount==1 && i==2){
+                cout<<output[0]<<"\t"<<output[1]<<"\t"<<output[2]<<"\n";
+                exit(1);
+            }*/
+            
             lossfn += whatspecies.costfn(species[i]);
-            if(distance(output.begin(),max_element(output.begin(),output.end()))==distance(species[i].begin(),max_element(species[i].begin(),species[i].end())))
+            if (distance(output.begin(), max_element(output.begin(),output.end()))==species[i]){
                 accuracy++;
+            }
+            whatspecies.gradcalc(species[i]);
+            //cout<<"gradcalc successful "<<i<<endl;
+            
+            whatspecies.addtosteps(learningrate);
+            //cout<<"addtosteps successful "<<i<<endl;
+            
+            if (i%batch_size==batch_size-1){
+                if(trainsize-i>batch_size){
+                    whatspecies.minibatchdesc(batch_size);
+                    //cout<<"MINI BATCH DESCENT SUCCESS"<<i<<endl;
+                    whatspecies.initializesteps();
+                    //cout<<"INITSTEPS SUCCESS "<<i<<endl;
+                }
+            }
+            if(i==trainsize-1) {
+                whatspecies.minibatchdesc(batch_size+datasize%batch_size);
+            }
         }
+        cout<<"Epoch "<<epochcount+1<<" done.\n";
         lossfn/= trainsize;
         accuracy /= trainsize;
         cout<<"Accuracy = "<<accuracy<<"\t";
-        cout<<"Loss = "<<lossfn<<endl;   
+        cout<<"Loss = "<<lossfn<<endl;  
     }
+
+    cout<<"now testing\n";
+    lossfn=0; accuracy=0;
+    for(i=trainsize;i<datasize;i++){
+        whatspecies.feedfwd(flowerparams[i]);
+        lossfn += whatspecies.costfn(species[i]);
+            if (distance(output.begin(), max_element(output.begin(),output.end()))==species[i]){
+                accuracy++;
+            }
+    }
+    lossfn/= (datasize-trainsize);
+    accuracy /= (datasize-trainsize);
+    cout<<"Accuracy = "<<accuracy<<"\t";
+    cout<<"Loss = "<<lossfn<<endl;
 
     whatspecies.saveParams(argv[1]);
 
@@ -91,7 +104,7 @@ int main(int argc, char ** argv){
 
 
 
-void getInputOutput(vector<vector<float> > &species, vector<vector<float> > &flowerparams, int &trainsize){
+void getInputOutput(vector<int> &species, vector<vector<float> > &flowerparams, int &datasize){
     
     ifstream trainfile("iris.csv");
     string line, num; 
@@ -103,14 +116,14 @@ void getInputOutput(vector<vector<float> > &species, vector<vector<float> > &flo
         flowerparams.push_back(vector<float>());
 
         while(getline(s,num,',') && num.length()<4)
-            flowerparams[trainsize].push_back(stof(num));
+            flowerparams[datasize].push_back(stof(num));
         
-        if(num=="setosa") species.push_back(vector<float>{1,0,0});
-        else if (num=="versicolor") species.push_back(vector<float>{0,1,0});
-        else if (num=="virginica") species.push_back(vector<float>{0,0,1});
-    trainsize++;
+        if(num=="setosa") species.push_back(0);
+        else if (num=="versicolor") species.push_back(1);
+        else if (num=="virginica") species.push_back(2);
+    datasize++;
     }
-    cout<<"Training data size = "<<trainsize<<endl;
+    cout<<"Training data size = "<<datasize<<endl;
 
     trainfile.close();
 }

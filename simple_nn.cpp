@@ -269,7 +269,7 @@ float NeuralNet::actfn_derivative(float a){
 }
 
 //the backpropagation implementation
-void NeuralNet::gradcalc(vector<float> &desired_output){
+void NeuralNet::gradcalc( int onehotindex, const vector<float> &desired_output){
     
     int l,i,j,k, prevlayersize=layers[n_layers-2].size(), currlayersize=output_size, nextlayersize;
     float gradsum;
@@ -277,8 +277,11 @@ void NeuralNet::gradcalc(vector<float> &desired_output){
     //cout<<"gradcalc"<<endl;
     //calculating gradient for weights and biases of final layer
     for (i=0;i<currlayersize;i++){
-        
-        gradsum = (layers[n_layers-1][i] - desired_output[i]);
+        if (desired_output.empty()){
+            if (i==onehotindex) gradsum = layers[n_layers-1][i]-1.0;
+            else gradsum = layers[n_layers-1][i];
+        }
+        else gradsum = (layers[n_layers-1][i] - desired_output[i]);
 
         //gradient of weights
         for(j=0;j<prevlayersize; j++){
@@ -327,30 +330,47 @@ void NeuralNet::gradcalc(vector<float> &desired_output){
 }
 
 
-float NeuralNet::costfn(vector<float> &desired_output){
+float NeuralNet::costfn(int onehotindex, const vector<float> &desired_output){
     float result = 0; int i;
 
     //binary cross entropy
     //if final activation function is sigmoid.
     if (final_actfn_name=="sigmoid"){
+        if (desired_output.empty()){
+            return -log(layers[n_layers-1][onehotindex]);
+        }
+        else{
         for (i=0;i<output_size;i++)
             result += -desired_output[i]*log(layers[n_layers-1][i])- (1-desired_output[i])*log(1-layers[n_layers-1][i]);
             return result;
+        }
     }
     
     //categorical cross entropy
     //use if final activation function is softmax.
     else if(final_actfn_name=="softmax"){
+        if (desired_output.empty()){
+            return -log(layers[n_layers-1][onehotindex]);
+        }
+        else{
         for (i=0;i<output_size;i++)
             result += -desired_output[i]*log(layers[n_layers-1][i]);
         return result;
+        }
     }
 
     //default is sum of least squares.
     //use this if you do not apply activation function to final layer.
     else {
+        if(desired_output.empty()){
+            for (i=0;i<output_size;i++)
+            if (i==onehotindex) result+= (layers[n_layers-1][i]-1.0)*(layers[n_layers-1][i]-1.0);
+            else result += (layers[n_layers-1][i])*(layers[n_layers-1][i]);
+        }
+        else{
         for (i=0;i<output_size;i++) 
             result += (layers[n_layers-1][i]-desired_output[i])*(layers[n_layers-1][i]-desired_output[i]);
+        }
         return result/2;
     }
 }
@@ -367,13 +387,9 @@ void NeuralNet::initializesteps(){
 }
 
 
-void NeuralNet::addtosteps(vector<float> &input_vec, vector<float> &desired_output){
+void NeuralNet::addtosteps(float learningrate){
 
     int l, i, j, nextlayersize, currlayersize=input_size;
-    float learningrate=0.1;
-    
-    feedfwd(input_vec);
-    gradcalc(desired_output);
 
     for (l=0; l<n_layers-1;l++){
         nextlayersize=weights[l].size();
@@ -386,17 +402,11 @@ void NeuralNet::addtosteps(vector<float> &input_vec, vector<float> &desired_outp
 }
 
 
-void NeuralNet::minibatchdesc(std::vector<std::vector<float> > &input_batch, std::vector<std::vector<float> > &output_batch, int batch_size){
+void NeuralNet::minibatchdesc(int batch_size){
     int l,i,j,currlayersize=input_size,nextlayersize;
-    
-    initializesteps();
-
-    for (i=0;i<batch_size;i++){
-        addtosteps(input_batch[i],output_batch[i]);
-    }
 
     for(l=0;l<n_layers-1;l++){
-        nextlayersize=steps[l].size();
+        nextlayersize=weights[l].size();
 
         for(i=0;i<nextlayersize;i++){
             for(j=0;j<=currlayersize;j++)

@@ -11,11 +11,10 @@ class NeuralNet {
     int n_layers;
     int input_size;
     int output_size;
-    std::vector< std::vector< std::vector<float> > > weights;
     std::vector< std::vector<float> > layers;
     std::string actfn_name;
     std::string final_actfn_name;
-    
+    std::vector< std::vector< std::vector<float> > > weights;
     std::vector< std::vector< std::vector<float> > > gradient;
     std::vector< std::vector< std::vector<float> > > steps;
 
@@ -36,10 +35,10 @@ class NeuralNet {
    
     void feedfwd(std::vector<float> &input_vec);
     std::vector<float> Output();
-    float costfn(std::vector<float> &desired_output);
-    void gradcalc(std::vector<float> &desired_output);
-    void addtosteps(std::vector<float> &input_vec, std::vector<float> &desired_output);
-    void minibatchdesc(std::vector<std::vector<float> > &input_batch, std::vector<std::vector<float> > &output_batch, int batch_size);
+    float costfn( int onehotindex=0, const std::vector<float> &desired_output=std::vector<float>());
+    void gradcalc( int onehothindex=0, const std::vector<float> &desired_output=std::vector<float>());
+    void addtosteps(float learningrate);
+    void minibatchdesc(int batch_size);
 
 };
 
