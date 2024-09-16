@@ -99,7 +99,7 @@ void NeuralNet::initializeParams(){
     layers[0].resize(input_size);
     
     random_device gen;
-    normal_distribution<float> dist(0.0,1.0);
+    normal_distribution<double> dist(0.0,1.0);
 
     for(l=0; l<n_layers-2; l++) {
         
@@ -174,14 +174,14 @@ void NeuralNet::saveParams(string filename){
 }
 
 //feed forward func
-void NeuralNet::feedfwd(vector<float> &input_vec){
+void NeuralNet::feedfwd(vector<double> &input_vec){
     
     //first layer is input
     layers[0]=input_vec;
     
     //layer index, next layer index and current layer index
     int l, i, j, nextlayersize, currlayersize=input_size;
-    float z;
+    double z;
     //cout<<"feedfwd:"<<endl;
     //for(j=0;j<input_size;j++) cout<<layers[0][j]<<"  ";
     //cout<<endl;
@@ -216,12 +216,12 @@ void NeuralNet::feedfwd(vector<float> &input_vec){
 }
 
 
-vector<float> NeuralNet::Output(){
+vector<double> NeuralNet::Output(){
     return layers[n_layers-1];
 }
 
 
-float NeuralNet::activation(float z){
+double NeuralNet::activation(double z){
 
     if (actfn_name=="relu"){
         if(z<0) return 0.0;
@@ -235,10 +235,10 @@ float NeuralNet::activation(float z){
 }
 
 
-void NeuralNet::activatefinal (vector<float> &finlayer){
+void NeuralNet::activatefinal (vector<double> &finlayer){
     if (final_actfn_name=="softmax"){
-        float expsum=0;
-        float max = *max_element(finlayer.begin(),finlayer.end());
+        double expsum=0;
+        double max = *max_element(finlayer.begin(),finlayer.end());
         
         for (int i=0;i<output_size;i++){
             finlayer[i] = exp(finlayer[i]-max);
@@ -256,7 +256,7 @@ void NeuralNet::activatefinal (vector<float> &finlayer){
 }
 
 
-float NeuralNet::actfn_derivative(float a){
+double NeuralNet::actfn_derivative(double a){
     if(actfn_name=="relu"){
         if(a==0.0) return 0.0;
         else return 1.0;
@@ -269,10 +269,10 @@ float NeuralNet::actfn_derivative(float a){
 }
 
 //the backpropagation implementation
-void NeuralNet::gradcalc( int onehotindex, const vector<float> &desired_output){
+void NeuralNet::gradcalc( int onehotindex, const vector<double> &desired_output){
     
     int l,i,j,k, prevlayersize=layers[n_layers-2].size(), currlayersize=output_size, nextlayersize;
-    float gradsum;
+    double gradsum;
     
     //cout<<"gradcalc"<<endl;
     //calculating gradient for weights and biases of final layer
@@ -330,8 +330,8 @@ void NeuralNet::gradcalc( int onehotindex, const vector<float> &desired_output){
 }
 
 
-float NeuralNet::costfn(int onehotindex, const vector<float> &desired_output){
-    float result = 0; int i;
+double NeuralNet::costfn(int onehotindex, const vector<double> &desired_output){
+    double result = 0; int i;
 
     //binary cross entropy
     //if final activation function is sigmoid.
@@ -381,13 +381,13 @@ void NeuralNet::initializesteps(){
     for (l=0;l<n_layers-1;l++){
         nextlayersize=steps[l].size();
         for (i=0;i<nextlayersize;i++)
-            steps[l][i]=vector<float>(currlayersize+1,0.0);
+            steps[l][i]=vector<double>(currlayersize+1,0.0);
         currlayersize=nextlayersize;
     }
 }
 
 
-void NeuralNet::addtosteps(float learningrate){
+void NeuralNet::addtosteps(double learningrate){
 
     int l, i, j, nextlayersize, currlayersize=input_size;
 

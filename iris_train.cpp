@@ -5,13 +5,13 @@
 using namespace std;
 
 
-void getInputOutput(vector<int> &species, vector<vector<float> > &flowerparams, int &datasize);
+void getInputOutput(vector<int> &species, vector<vector<double> > &flowerparams, int &datasize);
 
 
 int main(int argc, char ** argv){
 
     vector<int> species;
-    vector<vector<float> > flowerparams;
+    vector<vector<double> > flowerparams;
     int datasize = 0;
 
     getInputOutput(species,flowerparams, datasize);
@@ -21,8 +21,8 @@ int main(int argc, char ** argv){
     whatspecies.getParams(argv[1]);
 
     int epochs, batch_size, epochcount, i;
-    float lossfn, accuracy, learningrate=0.05;
-    vector<float> output;
+    double lossfn, accuracy, learningrate=0.05;
+    vector<double> output;
     int trainsize=(int)(0.8*datasize);
     //int trainsize=datasize;
 
@@ -104,7 +104,7 @@ int main(int argc, char ** argv){
 
 
 
-void getInputOutput(vector<int> &species, vector<vector<float> > &flowerparams, int &datasize){
+void getInputOutput(vector<int> &species, vector<vector<double> > &flowerparams, int &datasize){
     
     ifstream trainfile("iris.csv");
     string line, num; 
@@ -113,7 +113,7 @@ void getInputOutput(vector<int> &species, vector<vector<float> > &flowerparams, 
     while(getline(trainfile,line)){
         stringstream s(line);
 
-        flowerparams.push_back(vector<float>());
+        flowerparams.push_back(vector<double>());
 
         while(getline(s,num,',') && num.length()<4)
             flowerparams[datasize].push_back(stof(num));
