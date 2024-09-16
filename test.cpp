@@ -12,8 +12,8 @@ int main(){
     std::mt19937 eng2 = eng1;
 
     for (int i = 0; i< 10; i++){
-        std::shuffle(v1.begin(),v1.end(),eng1);
-        std::shuffle(v2.begin(),v2.end(),eng2);
+        std::shuffle(v1.begin(),v1.begin()+4,eng1);
+        std::shuffle(v2.begin(),v2.begin()+4,eng2);
     }
 
     for (int i=0; i<8; i++) std::cout<<v1[i]<<" "<<v2[i]<<std::endl;

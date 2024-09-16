@@ -16,15 +16,19 @@ int main(int argc, char ** argv){
 
     getInputOutput(species,flowerparams, datasize);
 
+    int trainsize=(int)(0.8*datasize);
+    //int trainsize=datasize;
+
+    cout<<"Total data size = "<<datasize<<endl;
+    cout<<"Data size used for training = "<<trainsize<<endl;
+
     NeuralNet whatspecies;
 
     whatspecies.getParams(argv[1]);
 
     int epochs, batch_size, epochcount, i;
-    float lossfn, accuracy, learningrate=0.05;
+    float lossfn, accuracy, learningrate=0.1;
     vector<float> output;
-    int trainsize=(int)(0.8*datasize);
-    //int trainsize=datasize;
 
     cout<<"Enter number of epochs: ";
     cin>>epochs;
@@ -36,23 +40,30 @@ int main(int argc, char ** argv){
     mt19937 eng1(rd());
     mt19937 eng2 = eng1;
 
-    for (epochcount=0; epochcount<epochs; epochcount++){   
-
+    for(i=0;i<100;i++){
         shuffle(flowerparams.begin(), flowerparams.end(),eng1);
-        shuffle(species.begin(), species.end(),eng2);     
+        shuffle(species.begin(), species.end(),eng2);
+    }
+
+    for (epochcount=0; epochcount<epochs; epochcount++){
+    
+        shuffle(flowerparams.begin(), flowerparams.begin()+trainsize,eng1);
+        shuffle(species.begin(), species.begin()+trainsize,eng2);     
 
         lossfn = 0.0; accuracy = 0.0;
 
         whatspecies.initializesteps();
+        
         for (i=0;i<trainsize;i++){
+
+            //cout<<flowerparams[i][0]<<"\t"<<flowerparams[i][1]<<"\t"<<flowerparams[i][2]<<"\t"<<flowerparams[i][3]<<"\n";
+            //cout<<species[i]<<endl;
 
             whatspecies.feedfwd(flowerparams[i]);
             //cout<<"feedfwd successful "<<i<<endl;
+            
             output = whatspecies.Output();
-            /*if(epochcount==1 && i==2){
-                cout<<output[0]<<"\t"<<output[1]<<"\t"<<output[2]<<"\n";
-                exit(1);
-            }*/
+            //cout<<output[0]<<"\t"<<output[1]<<"\t"<<output[2]<<"\n";
             
             lossfn += whatspecies.costfn(species[i]);
             if (distance(output.begin(), max_element(output.begin(),output.end()))==species[i]){
@@ -73,7 +84,7 @@ int main(int argc, char ** argv){
                 }
             }
             if(i==trainsize-1) {
-                whatspecies.minibatchdesc(batch_size+datasize%batch_size);
+                whatspecies.minibatchdesc(batch_size+trainsize%batch_size);
             }
         }
         cout<<"Epoch "<<epochcount+1<<" done.\n";
@@ -83,10 +94,11 @@ int main(int argc, char ** argv){
         cout<<"Loss = "<<lossfn<<endl;  
     }
 
-    cout<<"now testing\n";
+   cout<<"now testing\n";
     lossfn=0; accuracy=0;
     for(i=trainsize;i<datasize;i++){
         whatspecies.feedfwd(flowerparams[i]);
+        output=whatspecies.Output();
         lossfn += whatspecies.costfn(species[i]);
             if (distance(output.begin(), max_element(output.begin(),output.end()))==species[i]){
                 accuracy++;
@@ -123,7 +135,6 @@ void getInputOutput(vector<int> &species, vector<vector<float> > &flowerparams, 
         else if (num=="virginica") species.push_back(2);
     datasize++;
     }
-    cout<<"Training data size = "<<datasize<<endl;
 
     trainfile.close();
 }

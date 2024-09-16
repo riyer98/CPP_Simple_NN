@@ -35,8 +35,8 @@ class NeuralNet {
    
     void feedfwd(std::vector<float> &input_vec);
     std::vector<float> Output();
-    float costfn( int onehotindex=0, const std::vector<float> &desired_output=std::vector<float>());
-    void gradcalc( int onehothindex=0, const std::vector<float> &desired_output=std::vector<float>());
+    float costfn(int onehotindex=0, const std::vector<float> &desired_output=std::vector<float>());
+    void gradcalc(int onehothindex=0, const std::vector<float> &desired_output=std::vector<float>());
     void addtosteps(float learningrate);
     void minibatchdesc(int batch_size);
 

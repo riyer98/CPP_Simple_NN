@@ -181,7 +181,6 @@ void NeuralNet::feedfwd(vector<float> &input_vec){
     
     //layer index, next layer index and current layer index
     int l, i, j, nextlayersize, currlayersize=input_size;
-    float z;
     //cout<<"feedfwd:"<<endl;
     //for(j=0;j<input_size;j++) cout<<layers[0][j]<<"  ";
     //cout<<endl;
@@ -193,19 +192,15 @@ void NeuralNet::feedfwd(vector<float> &input_vec){
         for (i=0; i<nextlayersize; i++){
             
             //sum initialized to bias term
-            z = weights[l][i][currlayersize];
+            layers[l+1][i] = weights[l][i][currlayersize];
             
             for (j=0;j< currlayersize;j++) {
                 //feedforward step
-                z += weights[l][i][j]* layers[l][j];
+                layers[l+1][i] += weights[l][i][j]* layers[l][j];
             } 
             
             //final layer uses different activation (e.g. softmax)
-            if(l==n_layers-2) layers[l+1][i] = z;
-            else {
-                layers[l+1][i] = activation(z);
-                //cout<<layers[l+1][i]<<"  ";
-            }
+            if(l!=n_layers-2) layers[l+1][i] = activation(layers[l+1][i]);
         }
         //cout<<endl;
         currlayersize=nextlayersize;
@@ -229,7 +224,7 @@ float NeuralNet::activation(float z){
     }
 
     else if (actfn_name=="sigmoid")
-        return 1/(1+exp(-z));
+        return 1.0/(1.0+exp(-z));
     
     else return z;
 }
@@ -269,8 +264,8 @@ float NeuralNet::actfn_derivative(float a){
 }
 
 //the backpropagation implementation
-void NeuralNet::gradcalc( int onehotindex, const vector<float> &desired_output){
-    
+void NeuralNet::gradcalc(int onehotindex, const vector<float> &desired_output){
+
     int l,i,j,k, prevlayersize=layers[n_layers-2].size(), currlayersize=output_size, nextlayersize;
     float gradsum;
     
@@ -321,7 +316,6 @@ void NeuralNet::gradcalc( int onehotindex, const vector<float> &desired_output){
             //biases gradient
             gradient[l][i][prevlayersize]=gradsum;
             //cout<<gradient[l][i][prevlayersize]<<endl;
-
         }
         //cout<<endl;
         nextlayersize=currlayersize;

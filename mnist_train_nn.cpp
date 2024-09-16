@@ -44,7 +44,7 @@ int main(int argc, char** argv){
     cout<<"time for gradient: "<<(float)(end-start)/1000000<<endl;*/
 
     int epochs, batch_size, epochcount, i;
-    float lossfn, accuracy, learningrate=0.1;
+    float lossfn, accuracy, learningrate=0.01;
     vector<float> output;
 
     cout<<"Enter number of epochs: ";
