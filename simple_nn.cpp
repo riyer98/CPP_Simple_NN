@@ -99,7 +99,7 @@ void NeuralNet::initializeParams(){
     layers[0].resize(input_size);
     
     random_device gen;
-    uniform_real_distribution<float> dist(-1.0,1.0);
+    uniform_real_distribution<float> dist(-0.5,0.5);
 
     for(l=0; l<n_layers-2; l++) {
         
@@ -223,8 +223,10 @@ float NeuralNet::activation(float z){
         else return z;
     }
 
-    else if (actfn_name=="sigmoid")
-        return 1.0/(1.0+exp(-z));
+    else if (actfn_name=="sigmoid"){
+        if (z<0) return exp(z)/(1.0+exp(z));
+        else return 1.0/(1.0+exp(-z));
+    }
     
     else return z;
 }
@@ -393,6 +395,7 @@ void NeuralNet::addtosteps(float learningrate){
             for (j=0;j<=currlayersize;j++)
                 steps[l][i][j]+= learningrate * gradient[l][i][j];
         }
+        currlayersize = nextlayersize;
     }
 }
 

@@ -44,8 +44,8 @@ int main(int argc, char** argv){
     cout<<"time for gradient: "<<(float)(end-start)/1000000<<endl;*/
 
     int epochs, batch_size, epochcount, i;
-    float lossfn, accuracy, learningrate=0.01;
-    vector<float> output;
+    float lossfn, accuracy, learningrate;
+    vector<float> output(10);
 
     cout<<"Enter number of epochs: ";
     cin>>epochs;
@@ -53,6 +53,8 @@ int main(int argc, char** argv){
     cout<<"Enter mini batch size: ";
     cin>>batch_size;
 
+    cout<<"Enter learning rate: ";
+    cin>>learningrate;
 
     random_device rd;
     mt19937 eng1(rd());
@@ -66,7 +68,7 @@ int main(int argc, char** argv){
         lossfn = 0.0; accuracy =0.0;
 
         whatdigit.initializesteps();
-        for (i=0;i<trainsize;i++){
+        for (i=0; i<trainsize; i++){
 
             whatdigit.feedfwd(normedpixelvals[i]);
             
@@ -82,12 +84,14 @@ int main(int argc, char** argv){
             if (i%batch_size==batch_size-1){
                 if(trainsize-i>batch_size){
                     whatdigit.minibatchdesc(batch_size);
+                    cout<< "Mini-Batch "<<i+1<<" Successful.\n";
+                    cout<<"Accuracy = "<<accuracy/(i+1)<<"\t Loss = "<<lossfn/(i+1)<<endl;
                     whatdigit.initializesteps();
                 }
             }
             if(i==trainsize-1) {
-                    whatdigit.minibatchdesc(batch_size+trainsize%batch_size);
-                }
+                whatdigit.minibatchdesc(batch_size+trainsize%batch_size);
+            }
         }
         cout<<"Epoch "<<epochcount+1<<" done.\n";
         lossfn/= trainsize;
