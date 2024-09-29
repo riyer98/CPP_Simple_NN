@@ -22,6 +22,12 @@ void NeuralNet::getParams(string filename){
     //top of file contains no. of layers (including input and output), activation 
     //to be used and size of input vector
     paramfile>>n_layers>>input_size>>output_size>>actfn_name>>final_actfn_name;
+
+    cout<<"Input size: "<<input_size<<endl;
+    cout<<"Output size: "<<output_size<<endl;
+    cout<<"Hidden layers: "<<n_layers-2<<endl;
+    cout<<"Activation: "<<actfn_name<<endl;
+    cout<<"Final layer activation: "<<final_actfn_name<<endl;
     
     //there are n_layers-1 weight matrices. The last column of each matrix 
     //contains the biases. That is, weights[l][i][currlayersize] = b[i]
@@ -36,6 +42,8 @@ void NeuralNet::getParams(string filename){
     
     for(int l=0;l<n_layers-1;l++){
         paramfile>>nextlayersize;
+        if(l!=n_layers-2) cout<<"Nodes hidden layer "<<l+1<<": "<<nextlayersize<<endl;
+        
         weights[l].resize(nextlayersize);
         gradient[l].resize(nextlayersize);
         steps[l].resize(nextlayersize);
@@ -53,11 +61,6 @@ void NeuralNet::getParams(string filename){
         currlayersize=nextlayersize;
     }
     cout<<"Parameters successfully obtained.\n";
-    cout<<"Input size: "<<input_size<<endl;
-    cout<<"Output size: "<<output_size<<endl;
-    cout<<"Hidden layers: "<<n_layers-2<<endl;
-    cout<<"Activation: "<<actfn_name<<endl;
-    cout<<"Final layer activation: "<<final_actfn_name<<endl;
 }
 
 void NeuralNet::initializeParams(){
