@@ -47,7 +47,25 @@ int main(int argc, char** argv){
     float lossfn, accuracy;
     vector<float> output(10);
 
-    for (i=0; i<testsize; i++){
+    while(true){
+        cout<<"Enter any index of input: ";
+        cin>>i;
+        
+        if (i<=0 || i>=testsize){
+            cout<<"Error: index should be integer between 1 and "<<testsize<<endl;
+            exit(1);
+        }
+        whatdigit.feedfwd(normedpixelvals[i-1]);
+            
+            output = whatdigit.Output();
+
+            lossfn = whatdigit.costfn(numbers[i-1]);
+            cout<<"Actual number = "<<numbers[i-1]<<endl;
+            cout<<"Predicted = "<<distance(output.begin(),max_element(output.begin(),output.end()))<<endl;
+            cout<<"Loss = "<<lossfn<<endl;
+    }
+
+    /*for (i=0; i<testsize; i++){
 
             whatdigit.feedfwd(normedpixelvals[i]);
             
@@ -63,7 +81,7 @@ int main(int argc, char** argv){
         lossfn/= testsize;
         accuracy /= testsize;
         cout<<"Accuracy = "<<accuracy<<"\t";
-        cout<<"Loss = "<<lossfn<<endl;
+        cout<<"Loss = "<<lossfn<<endl;*/
 
     return 0;
 }
